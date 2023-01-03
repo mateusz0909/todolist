@@ -34,37 +34,40 @@ const Display = (() => {
     }
   };
 
-  const handleCheckbox = (e) => {
-    let tID = e.path[1].attributes[0].value;
-    let pID = e.path[1].attributes[1].value;
-
-    projects[pID].tasks[tID].isCompleted = !projects[pID].tasks[tID]
-      .isCompleted;
-    e.path[1].classList.toggle("checked");
-  };
-
-  const handleAddNote = (e) => {
-    e.preventDefault();
-    let pID = e.target.parentElement.parentElement.attributes[1].value;
-    let tID = e.target.parentElement.parentElement.attributes[2].value;
-    let note = e.target.value;
-    addNote(pID, tID, note);
-  };
-
   const addProject = (project) => {
     projectList.innerHTML = "";
     projects.push(new Project(project));
-    showProjects();
     addToLocalStorage();
+    showProjects();
+    console.log(projects);
+  };
+
+  const deleteProject = (e) => {
+    const projectID = parseInt(e.target.attributes[0].value);
+    console.log(projects);
+    console.log("project deleted", e, projectID);
+    projects.splice(projectID, 1);
+    addToLocalStorage();
+    showProjects();
   };
 
   const showProjects = () => {
+    projectList.innerHTML = "";
     projects.forEach((el, i) => {
       let listItem = document.createElement("li");
       listItem.classList.add("project_item");
-      listItem.innerHTML = `<label class="project_item" dataId=${i}>${el.projectName}</label>`;
+      listItem.innerHTML = `<div class="project_item_row"> <label class="project_item" dataId=${i}>${el.projectName}</label> <span dataId=${i} class="material-symbols-outlined">
+      delete
+      </span> </div>`;
       projectList.appendChild(listItem);
+      addToLocalStorage();
     });
+    const deleteProjectIcon = document.querySelectorAll(
+      ".material-symbols-outlined"
+    );
+    deleteProjectIcon.forEach((e) =>
+      e.addEventListener("click", deleteProject)
+    );
   };
 
   const showTasks = (id = 0) => {
@@ -112,6 +115,28 @@ const Display = (() => {
       console.log("removed");
     }
   };
+  const handleCheckbox = (e) => {
+    let tID = e.path[1].attributes[0].value;
+    let pID = e.path[1].attributes[1].value;
+
+    projects[pID].tasks[tID].isCompleted = !projects[pID].tasks[tID]
+      .isCompleted;
+    e.path[1].classList.toggle("checked");
+  };
+
+  const handleAddNote = (e) => {
+    e.preventDefault();
+    let pID = e.target.parentElement.parentElement.attributes[1].value;
+    let tID = e.target.parentElement.parentElement.attributes[2].value;
+    let note = e.target.value;
+    addNote(pID, tID, note);
+  };
+
+  const addNote = (pID, tID, note) => {
+    console.log(projects[pID].tasks);
+    projects[pID].tasks[tID].notes = note;
+    addToLocalStorage();
+  };
 
   const addTask = (e) => {
     taskList.innerHTML = "";
@@ -132,12 +157,17 @@ const Display = (() => {
     taskContainer.appendChild(taskDetails);
     let notesInput = document.querySelector(".task_notes");
     task_details.classList.remove("hidden");
-    notesInput.addEventListener("focusout", handleAddNote);
-  };
+    resize();
 
-  const addNote = (pID, tID, note) => {
-    projects[pID].tasks[tID].addNote(note);
-    addToLocalStorage();
+    notesInput.addEventListener("focusout", handleAddNote);
+    notesInput.addEventListener("input", resize);
+    function resize() {
+      const lines = notesInput.value.split("\n").length;
+      const lineHeight = notesInput.scrollHeight / (lines + 1);
+      notesInput.style.height = "auto";
+      notesInput.style.height = notesInput.scrollHeight - lineHeight + "px";
+      console.log(notesInput.heigh, lines, lineHeight);
+    }
   };
 
   return {

@@ -22,9 +22,6 @@ class Task {
   addLabel(label) {
     this.labels.push(label);
   }
-  addNote(note) {
-    this.notes = note;
-  }
 }
 
 class Label {

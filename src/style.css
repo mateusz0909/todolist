@@ -13,6 +13,14 @@ ul {
   padding-left: 1em;
 }
 
+.project_item_row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: 2em;
+  margin-top: 0.5em;
+}
 label,
 li {
   cursor: pointer;
@@ -21,6 +29,17 @@ li {
 label {
   font-size: 1.2em;
   font-weight: 300;
+}
+.material-symbols-outlined {
+  opacity: 20%;
+  font-size: 1.2em;
+  padding: 0.2em;
+  border-radius: 50px;
+}
+
+.material-symbols-outlined:hover {
+  opacity: 100%;
+  background-color: rgba(255, 0, 0, 0.355);
 }
 .checked {
   color: rgb(99, 99, 99);
@@ -90,10 +109,6 @@ form.new_project_input {
 .add_project_btn:hover {
   background-color: #373f51;
   color: var(--tetriaty);
-}
-
-.project_item {
-  margin-top: 1em;
 }
 
 .cards_container {
@@ -199,12 +214,15 @@ h4 {
 .task_notes {
   width: 100%;
   background-color: var(--bg-color);
-  border: none;
+  border: 1px solid var(--bg-color-2);
   resize: none;
   border-radius: 5px;
   color: #838486;
   padding: 1em;
   margin-left: -1em;
+}
+textarea {
+  height: auto;
 }
 textarea:hover {
   background-color: rgb(12, 12, 12);
