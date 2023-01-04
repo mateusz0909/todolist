@@ -84,6 +84,9 @@ form.new_project_input {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  justify-content: space-between;
+  margin-top: 2em;
+  margin-right: 1em;
 }
 
 #new_project_input {
@@ -91,7 +94,7 @@ form.new_project_input {
   border: none;
   color: #d8dbe2;
   font-size: 1.2em;
-  padding: 2 0 0 0;
+  padding: 0 0 0 0;
   font-weight: 300;
 }
 #new_project_input:focus {
@@ -168,14 +171,13 @@ form.new_project_input {
 .add_task_btn {
   background-color: #3d3d3e;
   color: rgb(242, 242, 242);
-
   cursor: pointer;
   border: none;
   margin-right: 1em;
   height: 2em;
   width: 2em;
   border-radius: 50px;
-  font-size: 17px;
+  font-size: 19px;
 }
 
 .new_task_input:focus {
@@ -189,7 +191,8 @@ form.new_project_input {
 .task_li {
   display: flex;
   flex-direction: row;
-  padding: 0.7em 1em 0.7em 1em;
+  justify-content: space-between;
+  padding: 0.3em 1em 0.3em 1em;
 }
 
 .task_li:hover {
@@ -238,4 +241,17 @@ textarea:focus {
   color: #606e8e;
   font-weight: 300;
   font-size: 0.9em;
+}
+
+.date-label {
+  margin-right: 1em;
+  font-size: 1em;
+  color: #7483a3;
+  font-weight: 300;
+}
+#dueDate {
+  background-color: var(--bg-color-2);
+  border: none;
+  border-radius: 5px;
+  padding: 0.1em;
 }

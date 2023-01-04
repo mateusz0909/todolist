@@ -17,7 +17,7 @@ class Task {
     this.isCompleted = false;
     this.labels = [];
     this.notes = "";
-    this.dueDate = null;
+    this.dueDate = "";
   }
   addLabel(label) {
     this.labels.push(label);

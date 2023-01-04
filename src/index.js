@@ -26,12 +26,5 @@ Display.projectList.addEventListener("click", handleProjectClick);
 Display.projectInput.addEventListener("submit", handleAddProject);
 Display.newTaskInput.addEventListener("submit", handleAddTask);
 
-let defaultProject = "Project 1";
-Display.getFromLocalStorage();
-if (localStorage.key("projects")) {
-  Display.showProjects();
-  Display.showTasks();
-} else {
-  Display.addProject(defaultProject);
-  Display.showTasks();
-}
+Display.showProjects();
+Display.showTasks();

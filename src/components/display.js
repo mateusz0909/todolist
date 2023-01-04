@@ -11,19 +11,12 @@ const Display = (() => {
   const taskContainer = document.querySelector(".task_container");
   const task_details = document.querySelector(".task_details");
 
-  const addToLocalStorage = () => {
+  function addToLocalStorage() {
     window.localStorage.removeItem("projects");
     window.localStorage.setItem("projects", JSON.stringify(projects));
-  };
+  }
 
-  const getFromLocalStorage = () => {
-    // const str = window.localStorage.getItem("projects");
-    // // window.localStorage.removeItem("projects");
-    // projects = JSON.parse(str);
-    console.log(projects);
-  };
-
-  const handleShowTask = (e) => {
+  function handleShowTask(e) {
     e.preventDefault();
     if (e.target.type == "checkbox") {
     } else {
@@ -32,26 +25,34 @@ const Display = (() => {
         e.currentTarget.attributes[0].value
       );
     }
-  };
+  }
 
-  const addProject = (project) => {
+  function addProject(project) {
     projectList.innerHTML = "";
     projects.push(new Project(project));
     addToLocalStorage();
     showProjects();
-    console.log(projects);
-  };
+    let pID = projects.length - 1;
+    showTasks(pID);
+  }
 
-  const deleteProject = (e) => {
+  function deleteProject(e) {
     const projectID = parseInt(e.target.attributes[0].value);
-    console.log(projects);
-    console.log("project deleted", e, projectID);
     projects.splice(projectID, 1);
     addToLocalStorage();
     showProjects();
-  };
+    showTasks();
+  }
+  function deleteTask(e) {
+    const pID = parseInt(e.target.attributes[0].value);
+    const tID = parseInt(e.target.attributes[1].value);
 
-  const showProjects = () => {
+    projects[pID].tasks.splice(tID, 1);
+    addToLocalStorage();
+    showTasks(pID);
+  }
+
+  function showProjects() {
     projectList.innerHTML = "";
     projects.forEach((el, i) => {
       let listItem = document.createElement("li");
@@ -68,9 +69,9 @@ const Display = (() => {
     deleteProjectIcon.forEach((e) =>
       e.addEventListener("click", deleteProject)
     );
-  };
+  }
 
-  const showTasks = (id = 0) => {
+  function showTasks(id = 0) {
     taskList.innerHTML = "";
     newTaskInput.attributes[0].value = id;
     let tasksContainer = document.createElement("div");
@@ -85,16 +86,18 @@ const Display = (() => {
       let projectId = document.createAttribute("projectId");
       projectId.value = id;
       taskId.value = i;
-
       listItem.setAttributeNode(taskId);
       listItem.setAttributeNode(projectId);
       listItem.className = "task_li";
       listItem.classList.add(el.isCompleted ? "checked" : "unChecked");
       listItem.classList.add("task_item");
-      listItem.innerHTML = `<input id='checkbox' type="checkbox" ${
+      listItem.innerHTML = `<div><input id='checkbox' type="checkbox" ${
         el.isCompleted ? "checked" : ""
-      } ><label >${el.taskName}</label>`;
-
+      } ><label >${
+        el.taskName
+      }</label></div><span projectID=${id} taskID=${i} class="material-symbols-outlined delete-task">
+      delete
+      </span> `;
       ul.appendChild(listItem);
     });
     tasksContainer.appendChild(ul);
@@ -109,66 +112,84 @@ const Display = (() => {
     checkboxes.forEach((e) => e.addEventListener("click", handleCheckbox));
     if (projects[id].tasks.length == 0) {
       task_details.classList.add("hidden");
-      console.log("added");
     } else {
       task_details.classList.remove("hidden");
-      console.log("removed");
     }
-  };
-  const handleCheckbox = (e) => {
-    let tID = e.path[1].attributes[0].value;
-    let pID = e.path[1].attributes[1].value;
+    const deleteTaskIcon = document.querySelectorAll(".delete-task");
+    deleteTaskIcon.forEach((e) => e.addEventListener("click", deleteTask));
+  }
+  function handleCheckbox(e) {
+    let tID = e.path[2].attributes[0].value;
+    let pID = e.path[2].attributes[1].value;
 
     projects[pID].tasks[tID].isCompleted = !projects[pID].tasks[tID]
       .isCompleted;
     e.path[1].classList.toggle("checked");
-  };
 
-  const handleAddNote = (e) => {
+    if (projects[pID].tasks[tID].isCompleted) {
+      showTask(pID, tID);
+      taskContainer.style.opacity = "30%";
+      taskContainer.style.pointerEvents = "none";
+    } else {
+      taskContainer.style.opacity = "100%";
+      showTask(pID, tID);
+    }
+  }
+
+  function handleAddNote(e) {
     e.preventDefault();
     let pID = e.target.parentElement.parentElement.attributes[1].value;
     let tID = e.target.parentElement.parentElement.attributes[2].value;
     let note = e.target.value;
-    addNote(pID, tID, note);
-  };
 
-  const addNote = (pID, tID, note) => {
-    console.log(projects[pID].tasks);
     projects[pID].tasks[tID].notes = note;
     addToLocalStorage();
-  };
+  }
+  function submitDate(e) {
+    const date = e.target.value;
+    const pID = e.path[2].attributes[1].value;
+    const tID = e.path[2].attributes[2].value;
+    projects[pID].tasks[tID].dueDate = date;
+    addToLocalStorage();
+  }
 
-  const addTask = (e) => {
+  function addTask(e) {
     taskList.innerHTML = "";
     let newTaskName = e.target[0].value;
     let currentProjectIndex = e.target.attributes[0].value;
     projects[currentProjectIndex].tasks.unshift(new Task(newTaskName));
     showTasks(currentProjectIndex);
     addToLocalStorage();
-  };
+  }
 
-  const showTask = (projectID, taskID) => {
+  function showTask(projectID, taskID) {
     taskContainer.innerHTML = "";
+    taskContainer.style.pointerEvents = "all";
     const taskDetails = document.createElement("div");
     taskDetails.className = "task_details";
     taskDetails.setAttribute("pID", projectID);
     taskDetails.setAttribute("tID", taskID);
-    taskDetails.innerHTML = `<p class="bread_crumb">${projects[projectID].projectName} &nbsp>&nbsp  ${projects[projectID].tasks[taskID].taskName}</p><h3>${projects[projectID].tasks[taskID].taskName}</h3><h4>NOTES</h4><div class="text_area_wrapper"><textarea class="task_notes" rows="1" placeholder="Type your notes here">${projects[projectID].tasks[taskID].notes}</textarea></div>`;
+    taskDetails.innerHTML = `<p class="bread_crumb">${projects[projectID].projectName} &nbsp>&nbsp  ${projects[projectID].tasks[taskID].taskName}</p><h3>${projects[projectID].tasks[taskID].taskName}</h3><form>
+    <label class="date-label" for="dueDate">Due date:</label>
+    <input type="date" id="dueDate" name="dueDate" value=${projects[projectID].tasks[taskID].dueDate}><br>
+  </form><h4>NOTES</h4><div class="text_area_wrapper"><textarea class="task_notes" rows="1" placeholder="Type your notes here">${projects[projectID].tasks[taskID].notes}</textarea></div>`;
     taskContainer.appendChild(taskDetails);
     let notesInput = document.querySelector(".task_notes");
+    let dueDateInput = document.getElementById("dueDate");
+
     task_details.classList.remove("hidden");
     resize();
 
     notesInput.addEventListener("focusout", handleAddNote);
     notesInput.addEventListener("input", resize);
+    dueDateInput.addEventListener("input", submitDate);
     function resize() {
       const lines = notesInput.value.split("\n").length;
       const lineHeight = notesInput.scrollHeight / (lines + 1);
       notesInput.style.height = "auto";
       notesInput.style.height = notesInput.scrollHeight - lineHeight + "px";
-      console.log(notesInput.heigh, lines, lineHeight);
     }
-  };
+  }
 
   return {
     addProject,
@@ -180,7 +201,6 @@ const Display = (() => {
     taskList,
     newTaskInput,
     showTask,
-    getFromLocalStorage,
   };
 })();
 
