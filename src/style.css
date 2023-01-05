@@ -255,3 +255,10 @@ textarea:focus {
   border-radius: 5px;
   padding: 0.1em;
 }
+
+.no_projects_heading {
+  font-weight: 200;
+  font-size: 2em;
+  text-align: center;
+  margin-top: 20%;
+}

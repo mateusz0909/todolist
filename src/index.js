@@ -27,4 +27,3 @@ Display.projectInput.addEventListener("submit", handleAddProject);
 Display.newTaskInput.addEventListener("submit", handleAddTask);
 
 Display.showProjects();
-Display.showTasks();

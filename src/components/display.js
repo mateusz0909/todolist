@@ -10,12 +10,13 @@ const Display = (() => {
   const newTaskInput = document.querySelector(".new_task_input_form");
   const taskContainer = document.querySelector(".task_container");
   const task_details = document.querySelector(".task_details");
+  const cards_container = document.querySelector(".cards_container");
+  const no_projects_heading = document.querySelector(".no_projects_heading");
 
   function addToLocalStorage() {
     window.localStorage.removeItem("projects");
     window.localStorage.setItem("projects", JSON.stringify(projects));
   }
-
   function handleShowTask(e) {
     e.preventDefault();
     if (e.target.type == "checkbox") {
@@ -41,8 +42,8 @@ const Display = (() => {
     projects.splice(projectID, 1);
     addToLocalStorage();
     showProjects();
-    showTasks();
   }
+
   function deleteTask(e) {
     const pID = parseInt(e.target.attributes[0].value);
     const tID = parseInt(e.target.attributes[1].value);
@@ -54,6 +55,15 @@ const Display = (() => {
 
   function showProjects() {
     projectList.innerHTML = "";
+    if (projects.length == 0) {
+      cards_container.classList.add("hidden");
+      no_projects_heading.classList.remove("hidden");
+    } else {
+      cards_container.classList.remove("hidden");
+      no_projects_heading.classList.add("hidden");
+
+      showTasks();
+    }
     projects.forEach((el, i) => {
       let listItem = document.createElement("li");
       listItem.classList.add("project_item");
@@ -118,12 +128,14 @@ const Display = (() => {
     const deleteTaskIcon = document.querySelectorAll(".delete-task");
     deleteTaskIcon.forEach((e) => e.addEventListener("click", deleteTask));
   }
+
   function handleCheckbox(e) {
     let tID = e.path[2].attributes[0].value;
     let pID = e.path[2].attributes[1].value;
 
     projects[pID].tasks[tID].isCompleted = !projects[pID].tasks[tID]
       .isCompleted;
+    addToLocalStorage();
     e.path[1].classList.toggle("checked");
 
     if (projects[pID].tasks[tID].isCompleted) {
